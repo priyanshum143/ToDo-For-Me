@@ -10,6 +10,16 @@ A simple mobile to-do app with **My Day**, **Tomorrow**, and **repeating tasks**
 
 Tasks are stored locally with AsyncStorage.
 
+## Deploy to Vercel (use on iPhone via Safari)
+
+1. Push this repo to GitHub and connect it on [vercel.com](https://vercel.com).
+2. Vercel reads `vercel.json` automatically:
+   - **Build:** `npx expo export -p web`
+   - **Output:** `dist`
+3. Open your `*.vercel.app` URL in **Safari** → **Share** → **Add to Home Screen**.
+
+If the site downloads a file instead of showing the app, redeploy after pulling the latest commit (must include `vercel.json`).
+
 ## Run on your phone
 
 1. Install dependencies (already done if you cloned after setup):
