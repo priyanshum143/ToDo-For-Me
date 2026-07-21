@@ -1,6 +1,8 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
 import { colors, common, radius, spacing, typography } from '../theme';
 import type { Task } from '../types/task';
+import { buildDayText, shareDayText } from '../utils/exportDay';
 import { Card } from './Card';
 import { TaskItem } from './TaskItem';
 
@@ -23,6 +25,21 @@ export function TaskSection({
   onToggle,
   onEdit,
 }: TaskSectionProps) {
+  const [exportLabel, setExportLabel] = useState('Export');
+
+  const handleExport = () => {
+    const text = buildDayText(title, dateLabel, tasks, dateKey);
+    shareDayText(text, title).then(() => {
+      if (Platform.OS === 'web') {
+        setExportLabel('Copied!');
+        setTimeout(() => setExportLabel('Export'), 1500);
+      }
+    }).catch(() => {
+      setExportLabel('Error');
+      setTimeout(() => setExportLabel('Export'), 1500);
+    });
+  };
+
   return (
     <Card>
       <View style={styles.header}>
@@ -30,9 +47,16 @@ export function TaskSection({
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.dateLabel}>{dateLabel}</Text>
         </View>
-        <Pressable onPress={onAdd} style={styles.addBtn} hitSlop={8}>
-          <Text style={styles.addBtnText}>+ Add</Text>
-        </Pressable>
+        <View style={styles.headerActions}>
+          {tasks.length > 0 && (
+            <Pressable onPress={handleExport} hitSlop={8} style={styles.exportBtn}>
+              <Text style={styles.exportBtnText}>{exportLabel}</Text>
+            </Pressable>
+          )}
+          <Pressable onPress={onAdd} style={styles.addBtn} hitSlop={8}>
+            <Text style={styles.addBtnText}>+ Add</Text>
+          </Pressable>
+        </View>
       </View>
       <View style={styles.divider} />
       {tasks.length === 0 ? (
@@ -72,6 +96,24 @@ const styles = StyleSheet.create({
     ...typography.small,
     color: colors.textSecondary,
     marginTop: spacing.xs,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  exportBtn: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.full,
+    backgroundColor: colors.borderLight,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  exportBtnText: {
+    ...typography.link,
+    color: colors.textSecondary,
+    fontSize: 14,
   },
   addBtn: {
     backgroundColor: colors.primaryMuted,
